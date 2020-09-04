@@ -1,5 +1,6 @@
 package com.example.projetosprint;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -11,24 +12,39 @@ public class ComprasController {
 
     private List<LivroCompra> livros = new ArrayList<>();
 
-    @GetMapping("/listar")
-    public List<LivroCompra> getLivros () {
-        return livros;
+    @GetMapping
+    public ResponseEntity listarLivros () {
+        if (livros.isEmpty()) {
+           return ResponseEntity.status(204).build();
+           // return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(livros);
+        }
     }
 
-    @PostMapping("/cadastrar")
-    public void cadastrarLivro ( @RequestBody LivroCompra livro ) {
+    @PostMapping
+    public ResponseEntity cadastrarLivro ( @RequestBody LivroCompra livro) {
         livros.add(livro);
+        return ResponseEntity.status(201).build();
     }
 
-    @GetMapping("/recuperar/{id}")
-    public LivroCompra getLivro ( @PathVariable int id ) {
-        return livros.get(id - 1);
+    @GetMapping("/{id}")
+    public ResponseEntity recuperarLivro ( @PathVariable int id ) {
+        if (livros.size() >= id) {
+            return ResponseEntity.ok(livros.get(id - 1));
+        } else {
+            return ResponseEntity.status(404).build();
+        }
     }
 
-    @DeleteMapping("/excluir/{id}")
-    public void excluirLivro ( @PathVariable int id ) {
-        livros.remove(id - 1);
+    @DeleteMapping("/{id}")
+    public ResponseEntity excluirLivro ( @PathVariable int id ) {
+        if (livros.size() >= id) {
+            livros.remove(id - 1);
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.status(404).build();
+        }
     }
 
     @PutMapping("/alterar/{id}")
